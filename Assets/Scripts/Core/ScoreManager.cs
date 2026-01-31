@@ -199,6 +199,16 @@ namespace EscapeTrainRun.Core
         }
 
         /// <summary>
+        /// Sets the score multiplier value directly.
+        /// Used by PowerUpManager for more control over multiplier effects.
+        /// </summary>
+        public void SetScoreMultiplier(int multiplier)
+        {
+            scoreMultiplier = Mathf.Max(1, multiplier);
+            Debug.Log($"[ScoreManager] Score multiplier set to: {scoreMultiplier}x");
+        }
+
+        /// <summary>
         /// Creates game over data for the current session.
         /// </summary>
         public GameOverData CreateGameOverData(ThemeType theme)

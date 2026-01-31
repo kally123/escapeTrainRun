@@ -351,6 +351,26 @@ namespace EscapeTrainRun.Player
             }
         }
 
+        /// <summary>
+        /// Sets the animator reference (for character swapping).
+        /// </summary>
+        public void SetAnimator(Animator newAnimator)
+        {
+            animator = newAnimator;
+            if (animator != null)
+            {
+                CacheAnimatorHashes();
+            }
+        }
+
+        /// <summary>
+        /// Gets the current animator.
+        /// </summary>
+        public Animator GetAnimator()
+        {
+            return animator;
+        }
+
         #endregion
     }
 }

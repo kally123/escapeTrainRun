@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using EscapeTrainRun.Environment;
 using EscapeTrainRun.Collectibles;
+using EscapeTrainRun.Characters;
 
 namespace EscapeTrainRun.Events
 {
@@ -85,6 +86,16 @@ namespace EscapeTrainRun.Events
 
         /// <summary>Fired when a UI panel should be hidden.</summary>
         public static event Action<string> OnHidePanel;
+
+        #endregion
+
+        #region Character Events
+
+        /// <summary>Fired when a character is selected for gameplay.</summary>
+        public static event Action<CharacterData> OnCharacterSelected;
+
+        /// <summary>Fired when a new character is unlocked.</summary>
+        public static event Action<CharacterData> OnCharacterUnlocked;
 
         #endregion
 
@@ -213,6 +224,22 @@ namespace EscapeTrainRun.Events
 
         #endregion
 
+        #region Character Event Triggers
+
+        public static void TriggerCharacterSelected(CharacterData character)
+        {
+            OnCharacterSelected?.Invoke(character);
+            Debug.Log($"[GameEvents] Character selected: {character?.DisplayName}");
+        }
+
+        public static void TriggerCharacterUnlocked(CharacterData character)
+        {
+            OnCharacterUnlocked?.Invoke(character);
+            Debug.Log($"[GameEvents] Character unlocked: {character?.DisplayName}");
+        }
+
+        #endregion
+
         #region Cleanup
 
         /// <summary>
@@ -241,6 +268,8 @@ namespace EscapeTrainRun.Events
             OnSegmentCountChanged = null;
             OnShowPanel = null;
             OnHidePanel = null;
+            OnCharacterSelected = null;
+            OnCharacterUnlocked = null;
 
             Debug.Log("[GameEvents] All events cleared");
         }

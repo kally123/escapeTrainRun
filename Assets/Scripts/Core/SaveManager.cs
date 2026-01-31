@@ -118,6 +118,7 @@ namespace EscapeTrainRun.Core
                 playerId = Guid.NewGuid().ToString(),
                 playerName = "Player",
                 totalCoins = 0,
+                totalCoinsCollected = 0,
                 highScore = 0,
                 highScoreTrain = 0,
                 highScoreBus = 0,
@@ -141,6 +142,7 @@ namespace EscapeTrainRun.Core
         public void AddCoins(int amount)
         {
             currentSaveData.totalCoins += amount;
+            currentSaveData.totalCoinsCollected += amount;
             SaveGameData();
         }
 
@@ -263,6 +265,18 @@ namespace EscapeTrainRun.Core
         #endregion
 
         #region Statistics
+
+        /// <summary>Gets total coins currently available.</summary>
+        public int TotalCoins => currentSaveData.totalCoins;
+
+        /// <summary>Gets total coins ever collected.</summary>
+        public int TotalCoinsCollected => currentSaveData.totalCoinsCollected;
+
+        /// <summary>Gets total distance ever run.</summary>
+        public float TotalDistanceRun => currentSaveData.totalDistanceRun;
+
+        /// <summary>Gets total games played.</summary>
+        public int GamesPlayed => currentSaveData.totalGamesPlayed;
 
         public void IncrementGamesPlayed()
         {
@@ -393,6 +407,7 @@ namespace EscapeTrainRun.Core
         public string playerId;
         public string playerName;
         public int totalCoins;
+        public int totalCoinsCollected;
         public int highScore;
         public int highScoreTrain;
         public int highScoreBus;

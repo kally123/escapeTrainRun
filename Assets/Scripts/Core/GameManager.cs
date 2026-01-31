@@ -194,6 +194,14 @@ namespace EscapeTrainRun.Core
         }
 
         /// <summary>
+        /// Returns to main menu (alias for GoToMainMenu).
+        /// </summary>
+        public void ReturnToMenu()
+        {
+            GoToMainMenu();
+        }
+
+        /// <summary>
         /// Sets the game theme for the next game.
         /// </summary>
         public void SetTheme(ThemeType theme)
