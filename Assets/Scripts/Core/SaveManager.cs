@@ -406,20 +406,50 @@ namespace EscapeTrainRun.Core
     {
         public string playerId;
         public string playerName;
+        public int coins;
         public int totalCoins;
         public int totalCoinsCollected;
         public int highScore;
         public int highScoreTrain;
         public int highScoreBus;
+        public int highScorePark;
         public int highScoreGround;
+        public int gamesPlayed;
         public int totalGamesPlayed;
+        public float totalDistance;
         public float totalDistanceRun;
+        public string selectedCharacter;
         public string currentCharacter;
         public List<string> unlockedCharacters;
         public List<string> unlockedOutfits;
         public List<string> achievements;
+        public Dictionary<string, int> achievementProgress;
+        public GameSettings settings;
         public int dailyRewardStreak;
         public string lastDailyRewardDate;
         public string lastSaveTime;
+
+        public GameSaveData()
+        {
+            settings = new GameSettings();
+            achievementProgress = new Dictionary<string, int>();
+            unlockedCharacters = new List<string>();
+            unlockedOutfits = new List<string>();
+            achievements = new List<string>();
+        }
+    }
+
+    /// <summary>
+    /// Game settings that persist across sessions.
+    /// </summary>
+    [Serializable]
+    public class GameSettings
+    {
+        public float musicVolume = 1f;
+        public float sfxVolume = 1f;
+        public bool vibrateEnabled = true;
+        public bool notificationsEnabled = true;
+        public int qualityLevel = 2;
+        public string language = "en";
     }
 }
