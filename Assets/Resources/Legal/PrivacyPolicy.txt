@@ -1,0 +1,107 @@
+ESCAPE TRAIN RUN - PRIVACY POLICY
+
+Last Updated: February 1, 2026
+
+This Privacy Policy describes how Escape Train Run ("we", "us", or "our") collects, uses, and protects information when you use our mobile game application.
+
+CHILDREN'S PRIVACY (COPPA COMPLIANCE)
+=====================================
+
+Escape Train Run is designed for children ages 6-12. We are committed to complying with the Children's Online Privacy Protection Act (COPPA).
+
+We do NOT:
+- Collect personal information from children under 13
+- Require registration or login
+- Collect names, email addresses, or physical addresses
+- Collect photos, videos, or audio recordings
+- Track precise location data
+- Share any data with third parties for marketing purposes
+
+INFORMATION WE COLLECT
+======================
+
+1. Gameplay Data (Anonymous)
+   - High scores and game progress
+   - Coins collected and characters unlocked
+   - Gameplay session duration
+   - Device performance metrics (for optimization)
+
+2. Device Information (Non-Personal)
+   - Device type and model
+   - Operating system version
+   - Game version
+   - General region (country level only)
+
+This information is stored locally on your device and is not transmitted to external servers unless you choose to use cloud save features.
+
+CLOUD SAVE (OPTIONAL)
+=====================
+
+If you enable cloud save functionality:
+- Game progress is stored securely in the cloud
+- No personal information is required
+- Data is encrypted in transit and at rest
+- You can delete your cloud data at any time
+
+THIRD-PARTY SERVICES
+====================
+
+We may use the following third-party services:
+- Unity Analytics (anonymous gameplay metrics)
+- Platform services (App Store, Google Play)
+
+These services have their own privacy policies and data practices.
+
+ADVERTISING
+===========
+
+If advertisements are displayed:
+- Ads are age-appropriate and COPPA-compliant
+- No behavioral or personalized advertising to children
+- No data is shared with advertisers
+
+PARENTAL CONTROLS
+=================
+
+Parents can:
+- Disable cloud save features
+- Disable network features entirely
+- Reset game progress
+- Contact us with questions or concerns
+
+DATA SECURITY
+=============
+
+We implement appropriate security measures to protect game data:
+- Local data stored securely on device
+- Cloud data encrypted
+- No sensitive personal information collected
+
+YOUR RIGHTS
+===========
+
+You have the right to:
+- Access your game data
+- Delete your game data
+- Opt out of optional features
+- Contact us with privacy concerns
+
+CHANGES TO THIS POLICY
+======================
+
+We may update this Privacy Policy from time to time. Changes will be reflected in the "Last Updated" date.
+
+CONTACT US
+==========
+
+If you have questions about this Privacy Policy or our data practices:
+- Email: privacy@escapetrainrun.example.com
+- Website: https://escapetrainrun.example.com/privacy
+
+For parents with concerns about children's privacy:
+- Email: parents@escapetrainrun.example.com
+
+---
+
+This game is published by [Your Company Name]
+© 2026 All Rights Reserved

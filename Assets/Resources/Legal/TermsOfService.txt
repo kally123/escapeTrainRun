@@ -1,0 +1,104 @@
+ESCAPE TRAIN RUN - TERMS OF SERVICE
+
+Last Updated: February 1, 2026
+
+Welcome to Escape Train Run! These Terms of Service govern your use of our game.
+
+ACCEPTANCE OF TERMS
+===================
+
+By downloading, installing, or playing Escape Train Run, you agree to these Terms. If you are a parent or guardian, you agree on behalf of your child.
+
+AGE REQUIREMENTS
+================
+
+Escape Train Run is designed for children ages 6-12. Children under 13 may play with parental consent and supervision as required by applicable law.
+
+LICENSE
+=======
+
+We grant you a limited, non-exclusive, non-transferable license to:
+- Download and install the game on your personal devices
+- Play the game for personal, non-commercial entertainment
+
+You may NOT:
+- Copy, modify, or distribute the game
+- Reverse engineer or decompile the game
+- Use the game for commercial purposes
+- Create derivative works
+
+VIRTUAL CURRENCY AND PURCHASES
+==============================
+
+1. In-Game Coins
+   - Coins are virtual currency with no real-world value
+   - Coins cannot be exchanged for real money
+   - Coins are used to unlock characters and items
+
+2. In-App Purchases (if applicable)
+   - Purchases require parental consent for children
+   - All sales are final unless required by law
+   - Virtual items have no real-world value
+
+USER CONDUCT
+============
+
+Players agree to:
+- Play fairly and respectfully
+- Not attempt to cheat or exploit the game
+- Not share inappropriate content through any game features
+- Report any bugs or issues
+
+INTELLECTUAL PROPERTY
+=====================
+
+All content in Escape Train Run is owned by us or our licensors:
+- Characters, artwork, and animations
+- Music and sound effects
+- Game mechanics and code
+- Trademarks and logos
+
+DISCLAIMER OF WARRANTIES
+========================
+
+The game is provided "AS IS" without warranties of any kind. We do not guarantee:
+- Uninterrupted or error-free operation
+- Compatibility with all devices
+- Availability of online features
+
+LIMITATION OF LIABILITY
+=======================
+
+To the maximum extent permitted by law, we are not liable for:
+- Indirect, incidental, or consequential damages
+- Loss of data or game progress
+- Issues arising from third-party services
+
+TERMINATION
+===========
+
+We may terminate or suspend access to the game for:
+- Violation of these Terms
+- Fraudulent or illegal activity
+- Any reason with or without notice
+
+CHANGES TO TERMS
+================
+
+We may update these Terms at any time. Continued use of the game constitutes acceptance of updated Terms.
+
+GOVERNING LAW
+=============
+
+These Terms are governed by the laws of [Your Jurisdiction], without regard to conflict of law principles.
+
+CONTACT
+=======
+
+For questions about these Terms:
+- Email: legal@escapetrainrun.example.com
+- Website: https://escapetrainrun.example.com/terms
+
+---
+
+© 2026 [Your Company Name]. All Rights Reserved.
