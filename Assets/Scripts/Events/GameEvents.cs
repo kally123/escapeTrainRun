@@ -99,6 +99,19 @@ namespace EscapeTrainRun.Events
 
         #endregion
 
+        #region Obstacle Events
+
+        /// <summary>Fired when an obstacle is passed without collision.</summary>
+        public static event Action OnObstaclePassed;
+
+        /// <summary>Fired when player has a near miss with an obstacle.</summary>
+        public static event Action OnNearMiss;
+
+        /// <summary>Fired when shield is broken by obstacle.</summary>
+        public static event Action OnShieldBroken;
+
+        #endregion
+
         #region Player Event Triggers
 
         public static void TriggerScoreChanged(int newScore)
@@ -240,6 +253,33 @@ namespace EscapeTrainRun.Events
 
         #endregion
 
+        #region Obstacle Event Triggers
+
+        public static void TriggerObstaclePassed()
+        {
+            OnObstaclePassed?.Invoke();
+        }
+
+        public static void TriggerNearMiss()
+        {
+            OnNearMiss?.Invoke();
+        }
+
+        public static void TriggerShieldBroken()
+        {
+            OnShieldBroken?.Invoke();
+        }
+
+        // Alias methods for RaiseXxx naming convention
+        public static void RaiseObstaclePassed() => TriggerObstaclePassed();
+        public static void RaiseNearMiss() => TriggerNearMiss();
+        public static void RaiseShieldBroken() => TriggerShieldBroken();
+        public static void RaiseScoreChanged(int score) => TriggerScoreChanged(score);
+        public static void RaisePlayerCrashed() => TriggerPlayerCrashed();
+        public static void RaiseGameOver(GameOverData data) => TriggerGameOver(data);
+
+        #endregion
+
         #region Cleanup
 
         /// <summary>
@@ -270,6 +310,9 @@ namespace EscapeTrainRun.Events
             OnHidePanel = null;
             OnCharacterSelected = null;
             OnCharacterUnlocked = null;
+            OnObstaclePassed = null;
+            OnNearMiss = null;
+            OnShieldBroken = null;
 
             Debug.Log("[GameEvents] All events cleared");
         }

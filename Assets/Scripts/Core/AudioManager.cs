@@ -529,6 +529,7 @@ namespace EscapeTrainRun.Core
         public void PlayWarning() => PlaySFX(warningSound);
         public void PlayShieldBreak() => PlaySFX(shieldBreakSound);
         public void PlayPowerUpWarning() => PlaySFX(powerUpWarningSound);
+        public void PlayObstacleDestroy() => PlaySFXVaried(crashSound); // Use crash sound variant for destruction
 
         #endregion
 
