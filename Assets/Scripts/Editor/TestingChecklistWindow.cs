@@ -1,204 +1,207 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 /// <summary>
-/// Editor window that provides an interactive testing checklist.
-/// Open from menu: Tools > Escape Train Run > Testing Checklist
+/// Editor window displaying a testing checklist for the game.
+/// Run from menu: Tools > Escape Train Run > Testing Checklist
 /// </summary>
 public class TestingChecklistWindow : EditorWindow
 {
     private Vector2 scrollPosition;
-    private bool[] checklistItems;
-    private string[] checklistDescriptions;
-    private string[] checklistHints;
+    private Dictionary<string, bool> checklistItems = new Dictionary<string, bool>();
 
     [MenuItem("Tools/Escape Train Run/Testing Checklist")]
     public static void ShowWindow()
     {
         var window = GetWindow<TestingChecklistWindow>("Testing Checklist");
-        window.minSize = new Vector2(500, 600);
-        window.Initialize();
+        window.minSize = new Vector2(450, 500);
     }
 
-    private void Initialize()
+    private void OnEnable()
     {
-        checklistDescriptions = new string[]
-        {
-            "Press Play - No console errors",
-            "Player appears at start position",
-            "Track generates ahead of player",
-            "Swipe/keyboard moves player (A/D or Arrow keys)",
-            "Player can jump (Space or W)",
-            "Player can slide (S or Down Arrow)",
-            "Coins are visible on track",
-            "Coins are collectible (score increases)",
-            "Obstacles appear on track",
-            "Obstacles cause collision/game over",
-            "UI shows score correctly",
-            "UI shows coin count correctly",
-            "Pause menu works (Escape key)",
-            "Resume from pause works",
-            "Game Over triggers on collision",
-            "Game Over panel appears",
-            "Restart button works",
-            "Main Menu button works",
-            "Scene transitions are smooth",
-            "Audio plays (music and SFX)"
-        };
+        LoadChecklist();
+    }
 
-        checklistHints = new string[]
+    private void LoadChecklist()
+    {
+        // Initialize checklist items with saved state
+        string[] items = GetChecklistItems();
+        foreach (var item in items)
         {
-            "Check Console window for red error messages",
-            "Player should be at approximately (0, 1, 0)",
-            "Look for multiple track segments spawning",
-            "Press A/D or Left/Right arrow keys",
-            "Press Space bar or W key",
-            "Press S key or Down arrow",
-            "Yellow/gold objects should appear",
-            "Watch the coin counter in UI",
-            "Various colored obstacles should spawn",
-            "Run into an obstacle to test",
-            "Top of screen should show distance/score",
-            "Coin count should update when collecting",
-            "Press Escape or tap pause button",
-            "Click Resume button in pause menu",
-            "Collide with an obstacle",
-            "Panel with score and buttons should appear",
-            "Click Restart to reload GamePlay scene",
-            "Click Main Menu to go to menu scene",
-            "No stuttering or black screens",
-            "Background music and coin collect sounds"
-        };
+            string key = "TestChecklist_" + item.GetHashCode();
+            checklistItems[item] = EditorPrefs.GetBool(key, false);
+        }
+    }
 
-        checklistItems = new bool[checklistDescriptions.Length];
+    private string[] GetChecklistItems()
+    {
+        return new string[]
+        {
+            // Core Mechanics
+            "[CORE] Player can move left/center/right lanes",
+            "[CORE] Player can jump over obstacles",
+            "[CORE] Player can slide under obstacles",
+            "[CORE] Collision with obstacles triggers game over",
+            "[CORE] Coins can be collected",
+            "[CORE] Score increases over time",
+            
+            // Power-ups
+            "[POWERUP] Magnet collects nearby coins",
+            "[POWERUP] Shield protects from one hit",
+            "[POWERUP] Speed boost increases movement",
+            "[POWERUP] Coin multiplier doubles coin value",
+            "[POWERUP] Power-ups have duration and expire",
+            
+            // UI
+            "[UI] Main menu displays and buttons work",
+            "[UI] HUD shows score and coins",
+            "[UI] Pause menu pauses gameplay",
+            "[UI] Game over screen shows final score",
+            "[UI] Settings menu controls audio",
+            
+            // Shop System
+            "[SHOP] Characters display with prices",
+            "[SHOP] Can purchase characters with coins",
+            "[SHOP] Purchased characters can be selected",
+            "[SHOP] Selected character persists",
+            
+            // Audio
+            "[AUDIO] Background music plays",
+            "[AUDIO] Coin collection sound",
+            "[AUDIO] Power-up activation sound",
+            "[AUDIO] Jump/slide sounds",
+            "[AUDIO] Crash/game over sound",
+            
+            // Performance
+            "[PERF] Steady 60 FPS on target device",
+            "[PERF] No memory leaks during gameplay",
+            "[PERF] Level generation doesn't cause hitches",
+            
+            // Save System
+            "[SAVE] Coins persist between sessions",
+            "[SAVE] High score saves correctly",
+            "[SAVE] Unlocked characters persist",
+            "[SAVE] Settings save and load",
+            
+            // Polish
+            "[POLISH] Visual effects display correctly",
+            "[POLISH] Animations are smooth",
+            "[POLISH] Camera follows player smoothly",
+            "[POLISH] No Z-fighting or visual glitches"
+        };
     }
 
     private void OnGUI()
     {
-        if (checklistDescriptions == null)
+        GUILayout.Label("📋 Testing Checklist", EditorStyles.boldLabel);
+        GUILayout.Label("Check off items as you test them", EditorStyles.miniLabel);
+        GUILayout.Space(10);
+
+        EditorGUILayout.BeginHorizontal();
+        
+        if (GUILayout.Button("Check All"))
         {
-            Initialize();
+            SetAllChecks(true);
+        }
+        
+        if (GUILayout.Button("Uncheck All"))
+        {
+            SetAllChecks(false);
         }
 
-        GUILayout.Space(10);
-        
-        // Header
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-        GUILayout.Label("🧪 Phase 9: Testing Checklist", EditorStyles.boldLabel);
-        GUILayout.FlexibleSpace();
         EditorGUILayout.EndHorizontal();
-
-        GUILayout.Space(5);
-        EditorGUILayout.HelpBox(
-            "Complete this checklist to verify your game setup is working correctly.\n" +
-            "Check each item as you test it in Play mode.", 
-            MessageType.Info);
 
         GUILayout.Space(10);
 
         // Progress bar
-        int completedCount = 0;
-        foreach (var item in checklistItems) if (item) completedCount++;
-        float progress = (float)completedCount / checklistItems.Length;
+        int total = checklistItems.Count;
+        int completed = 0;
+        foreach (var item in checklistItems)
+        {
+            if (item.Value) completed++;
+        }
         
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.Label($"Progress: {completedCount}/{checklistItems.Length}", GUILayout.Width(100));
-        EditorGUI.ProgressBar(GUILayoutUtility.GetRect(300, 20), progress, $"{(progress * 100):F0}%");
-        EditorGUILayout.EndHorizontal();
+        float progress = total > 0 ? (float)completed / total : 0;
+        EditorGUI.ProgressBar(EditorGUILayout.GetControlRect(GUILayout.Height(20)), 
+            progress, $"Progress: {completed}/{total} ({(int)(progress * 100)}%)");
 
-        GUILayout.Space(15);
+        GUILayout.Space(10);
 
-        // Checklist
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-        // Core Functionality
-        DrawSection("🎮 Core Gameplay", 0, 6);
-        DrawSection("💰 Collectibles & Obstacles", 6, 4);
-        DrawSection("📊 User Interface", 10, 4);
-        DrawSection("⏸️ Game States", 14, 4);
-        DrawSection("🎵 Polish", 18, 2);
+        string currentCategory = "";
+        string[] items = GetChecklistItems();
 
-        EditorGUILayout.EndScrollView();
-
-        GUILayout.Space(10);
-
-        // Buttons
-        EditorGUILayout.BeginHorizontal();
-        
-        if (GUILayout.Button("Run Automated Validation", GUILayout.Height(30)))
+        foreach (var item in items)
         {
-            SetupValidator.RunFullValidation();
-        }
-        
-        if (GUILayout.Button("Reset Checklist", GUILayout.Height(30)))
-        {
-            for (int i = 0; i < checklistItems.Length; i++)
+            // Extract category
+            int bracketEnd = item.IndexOf(']');
+            if (bracketEnd > 0)
             {
-                checklistItems[i] = false;
+                string cat = item.Substring(1, bracketEnd - 1);
+                if (cat != currentCategory)
+                {
+                    currentCategory = cat;
+                    GUILayout.Space(10);
+                    GUILayout.Label(GetCategoryLabel(cat), EditorStyles.boldLabel);
+                }
             }
-        }
-        
-        EditorGUILayout.EndHorizontal();
 
-        GUILayout.Space(5);
-
-        if (GUILayout.Button("▶️ Enter Play Mode", GUILayout.Height(35)))
-        {
-            if (!EditorApplication.isPlaying)
-            {
-                EditorApplication.isPlaying = true;
-            }
-        }
-
-        GUILayout.Space(10);
-
-        // Completion message
-        if (completedCount == checklistItems.Length)
-        {
-            EditorGUILayout.HelpBox(
-                "🎉 Congratulations! All tests passed!\n\n" +
-                "Your game setup is complete. Consider moving to Phase 10 (Visual Polish) " +
-                "to add materials, lighting, and effects.", 
-                MessageType.None);
-        }
-    }
-
-    private void DrawSection(string title, int startIndex, int count)
-    {
-        GUILayout.Space(10);
-        
-        var style = new GUIStyle(EditorStyles.boldLabel);
-        style.fontSize = 13;
-        GUILayout.Label(title, style);
-        
-        EditorGUI.indentLevel++;
-
-        for (int i = startIndex; i < startIndex + count && i < checklistItems.Length; i++)
-        {
             EditorGUILayout.BeginHorizontal();
             
-            checklistItems[i] = EditorGUILayout.Toggle(checklistItems[i], GUILayout.Width(20));
+            bool oldValue = checklistItems.ContainsKey(item) ? checklistItems[item] : false;
+            bool newValue = EditorGUILayout.Toggle(oldValue, GUILayout.Width(20));
             
-            var labelStyle = new GUIStyle(EditorStyles.label);
-            if (checklistItems[i])
+            if (newValue != oldValue)
             {
-                labelStyle.normal.textColor = new Color(0.2f, 0.7f, 0.2f);
+                checklistItems[item] = newValue;
+                string key = "TestChecklist_" + item.GetHashCode();
+                EditorPrefs.SetBool(key, newValue);
+            }
+
+            // Display without the category prefix
+            string displayText = bracketEnd > 0 ? item.Substring(bracketEnd + 2) : item;
+            
+            if (newValue)
+            {
+                GUI.color = Color.green;
             }
             
-            GUILayout.Label(checklistDescriptions[i], labelStyle);
-            
-            if (GUILayout.Button("?", GUILayout.Width(25)))
-            {
-                EditorUtility.DisplayDialog(
-                    checklistDescriptions[i],
-                    checklistHints[i],
-                    "Got it!");
-            }
+            GUILayout.Label(displayText);
+            GUI.color = Color.white;
             
             EditorGUILayout.EndHorizontal();
         }
 
-        EditorGUI.indentLevel--;
+        EditorGUILayout.EndScrollView();
+    }
+
+    private string GetCategoryLabel(string cat)
+    {
+        return cat switch
+        {
+            "CORE" => "🎮 Core Mechanics",
+            "POWERUP" => "⚡ Power-ups",
+            "UI" => "🖥️ User Interface",
+            "SHOP" => "🛒 Shop System",
+            "AUDIO" => "🔊 Audio",
+            "PERF" => "📊 Performance",
+            "SAVE" => "💾 Save System",
+            "POLISH" => "✨ Polish",
+            _ => cat
+        };
+    }
+
+    private void SetAllChecks(bool value)
+    {
+        var keys = new List<string>(checklistItems.Keys);
+        foreach (var key in keys)
+        {
+            checklistItems[key] = value;
+            string prefKey = "TestChecklist_" + key.GetHashCode();
+            EditorPrefs.SetBool(prefKey, value);
+        }
+        Repaint();
     }
 }

@@ -4,15 +4,11 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Editor script to automatically set up the MainMenu scene with all required GameObjects.
+/// Editor script to automatically set up the MainMenu scene.
 /// Run from menu: Tools > Escape Train Run > Setup MainMenu Scene
 /// </summary>
 public class MainMenuSceneSetup : Editor
 {
-    private static Color primaryColor = new Color(0.2f, 0.6f, 0.9f, 1f);
-    private static Color secondaryColor = new Color(0.9f, 0.4f, 0.2f, 1f);
-    private static Color panelColor = new Color(0.15f, 0.15f, 0.25f, 0.95f);
-
     [MenuItem("Tools/Escape Train Run/Setup MainMenu Scene")]
     public static void SetupMainMenuScene()
     {
@@ -23,335 +19,136 @@ public class MainMenuSceneSetup : Editor
         }
 
         CreateManagers();
+        CreateCamera();
         CreateMainMenuCanvas();
         CreateSettingsPanel();
-        CreateParentGatePanel();
-        CreateBackground();
 
         Debug.Log("✅ MainMenu Scene Setup Complete!");
-        EditorUtility.DisplayDialog("Success", "MainMenu scene setup complete!\n\nRemember to:\n1. Add background image/sprite\n2. Add logo image\n3. Connect button events in Inspector", "OK");
+        EditorUtility.DisplayDialog("Success", "MainMenu scene setup complete!", "OK");
     }
-
-    #region Managers
 
     private static void CreateManagers()
     {
-        // MenuManager
-        var menuManager = CreateGameObject("MenuManager");
-        AddComponentSafe<EscapeTrainRun.MainMenuUI>(menuManager);
-
-        // SaveManager (needed for high scores)
         var saveManager = CreateGameObject("SaveManager");
-        AddComponentSafe<EscapeTrainRun.SaveManager>(saveManager);
+        AddComponentSafe<EscapeTrainRun.Core.SaveManager>(saveManager);
 
-        // AudioManager
         var audioManager = CreateGameObject("AudioManager");
-        AddComponentSafe<EscapeTrainRun.AudioManager>(audioManager);
+        AddComponentSafe<EscapeTrainRun.Core.AudioManager>(audioManager);
 
-        var musicSource = CreateChildGameObject(audioManager, "MusicSource");
-        var musicAudio = musicSource.AddComponent<AudioSource>();
-        musicAudio.loop = true;
-        musicAudio.playOnAwake = true;
-
-        var sfxSource = CreateChildGameObject(audioManager, "SFXSource");
-        sfxSource.AddComponent<AudioSource>();
-
-        // ParentControlManager
-        var parentManager = CreateGameObject("ParentControlManager");
-        AddComponentSafe<EscapeTrainRun.ParentControlManager>(parentManager);
-
-        Debug.Log("✅ MainMenu Managers created");
+        Debug.Log("✅ Created Managers");
     }
 
-    #endregion
+    private static void CreateCamera()
+    {
+        var existingCam = Camera.main;
+        if (existingCam != null)
+        {
+            Debug.Log("  ⏭️ Main Camera already exists");
+            return;
+        }
 
-    #region Main Canvas
+        var cameraGo = CreateGameObject("Main Camera");
+        cameraGo.tag = "MainCamera";
+        var camera = cameraGo.AddComponent<Camera>();
+        camera.clearFlags = CameraClearFlags.Skybox;
+        cameraGo.AddComponent<AudioListener>();
+
+        Debug.Log("✅ Created Main Camera");
+    }
 
     private static void CreateMainMenuCanvas()
     {
-        // Main Canvas
-        var canvasObj = CreateGameObject("MainMenuCanvas");
-        var canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 0;
+        var canvas = CreateGameObject("MainMenuCanvas");
+        var canvasComp = canvas.AddComponent<Canvas>();
+        canvasComp.renderMode = RenderMode.ScreenSpaceOverlay;
 
-        var scaler = canvasObj.AddComponent<CanvasScaler>();
+        var scaler = canvas.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1080, 1920);
+        scaler.referenceResolution = new Vector2(1920, 1080);
         scaler.matchWidthOrHeight = 0.5f;
 
-        canvasObj.AddComponent<GraphicRaycaster>();
+        canvas.AddComponent<GraphicRaycaster>();
+        AddComponentSafe<EscapeTrainRun.UI.MainMenuUI>(canvas);
 
-        // Background Image
-        var background = CreateUIImage(canvasObj, "Background");
-        SetRectTransformFull(background);
-        background.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.2f, 1f);
+        // Title
+        var title = CreateTMPText(canvas.transform, "Title", "ESCAPE TRAIN RUN", 72);
+        title.rectTransform.anchoredPosition = new Vector2(0, 300);
+        title.color = new Color(1f, 0.85f, 0.2f);
 
-        // Logo placeholder
-        var logo = CreateUIImage(canvasObj, "Logo");
-        SetRectTransform(logo, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -200), new Vector2(400, 200));
-        logo.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.3f, 0.5f); // Placeholder
-
-        // Title Text
-        var titleText = CreateTextMeshPro(canvasObj, "TitleText", "ESCAPE TRAIN RUN", 72);
-        SetRectTransform(titleText, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -420), new Vector2(800, 100));
-        var titleTMP = titleText.GetComponent<TextMeshProUGUI>();
-        titleTMP.fontStyle = FontStyles.Bold;
-        titleTMP.color = Color.white;
-
-        // High Score Display
-        var highScore = CreateTextMeshPro(canvasObj, "HighScoreDisplay", "BEST: 0", 36);
-        SetRectTransform(highScore, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -520), new Vector2(400, 50));
-        highScore.GetComponent<TextMeshProUGUI>().color = new Color(1f, 0.85f, 0.4f, 1f);
-
-        // Play Button (main CTA)
-        var playButton = CreateUIButton(canvasObj, "PlayButton", "PLAY", 56);
-        SetRectTransform(playButton, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 100), new Vector2(500, 120));
-        playButton.GetComponent<Image>().color = secondaryColor;
-
-        // Theme Selection Container
-        var themeSelection = CreateUIPanel(canvasObj, "ThemeSelection");
-        SetRectTransform(themeSelection, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -50), new Vector2(700, 150));
-
-        // Theme Label
-        var themeLabel = CreateTextMeshPro(themeSelection, "ThemeLabel", "SELECT THEME", 28);
-        SetRectTransform(themeLabel, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -10), new Vector2(300, 40));
-
-        // Train Theme Button
-        var trainBtn = CreateThemeButton(themeSelection, "TrainButton", "🚂\nTRAIN", -220);
-        
-        // Bus Theme Button
-        var busBtn = CreateThemeButton(themeSelection, "BusButton", "🚌\nBUS", 0);
-        
-        // Park Theme Button
-        var parkBtn = CreateThemeButton(themeSelection, "ParkButton", "🌳\nPARK", 220);
-
-        // Bottom Buttons Container
-        var bottomButtons = CreateUIPanel(canvasObj, "BottomButtons");
-        SetRectTransform(bottomButtons, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 200), new Vector2(800, 120));
+        // Play Button
+        var playBtn = CreateButton(canvas.transform, "PlayButton", "PLAY");
+        playBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 50);
+        playBtn.GetComponent<RectTransform>().sizeDelta = new Vector2(400, 100);
+        var playColors = playBtn.colors;
+        playColors.normalColor = new Color(0.2f, 0.8f, 0.3f);
+        playBtn.colors = playColors;
 
         // Shop Button
-        var shopBtn = CreateUIButton(bottomButtons, "ShopButton", "SHOP", 32);
-        SetRectTransform(shopBtn, new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(100, 0), new Vector2(180, 80));
-        shopBtn.GetComponent<Image>().color = primaryColor;
-
-        // Leaderboard Button
-        var leaderboardBtn = CreateUIButton(bottomButtons, "LeaderboardButton", "RANKS", 32);
-        SetRectTransform(leaderboardBtn, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 0), new Vector2(180, 80));
-        leaderboardBtn.GetComponent<Image>().color = primaryColor;
+        var shopBtn = CreateButton(canvas.transform, "ShopButton", "SHOP");
+        shopBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -80);
+        shopBtn.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 70);
 
         // Settings Button
-        var settingsBtn = CreateUIButton(bottomButtons, "SettingsButton", "⚙", 48);
-        SetRectTransform(settingsBtn, new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-100, 0), new Vector2(80, 80));
-        settingsBtn.GetComponent<Image>().color = new Color(0.4f, 0.4f, 0.5f, 1f);
+        var settingsBtn = CreateButton(canvas.transform, "SettingsButton", "SETTINGS");
+        settingsBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -170);
+        settingsBtn.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 70);
 
-        // Coin Display (top right)
-        var coinDisplay = CreateUIPanel(canvasObj, "CoinDisplay");
-        SetRectTransform(coinDisplay, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-100, -60), new Vector2(180, 60));
-        coinDisplay.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
+        // High Score Display
+        var highScore = CreateTMPText(canvas.transform, "HighScoreText", "HIGH SCORE: 0", 32);
+        highScore.rectTransform.anchoredPosition = new Vector2(0, 180);
 
-        var coinIcon = CreateUIImage(coinDisplay, "CoinIcon");
-        SetRectTransform(coinIcon, new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(30, 0), new Vector2(40, 40));
-        coinIcon.GetComponent<Image>().color = new Color(1f, 0.85f, 0.2f, 1f);
-
-        var coinText = CreateTextMeshPro(coinDisplay, "CoinText", "0", 32);
-        SetRectTransform(coinText, new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-50, 0), new Vector2(100, 40));
-
-        Debug.Log("✅ MainMenu Canvas created");
+        Debug.Log("✅ Created Main Menu Canvas");
     }
-
-    private static GameObject CreateThemeButton(GameObject parent, string name, string text, float xOffset)
-    {
-        var btn = CreateUIButton(parent, name, text, 24);
-        SetRectTransform(btn, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(xOffset, -20), new Vector2(150, 100));
-        btn.GetComponent<Image>().color = new Color(0.25f, 0.25f, 0.35f, 1f);
-        
-        var tmpText = btn.GetComponentInChildren<TextMeshProUGUI>();
-        if (tmpText != null)
-        {
-            tmpText.fontSize = 24;
-            tmpText.enableAutoSizing = true;
-            tmpText.fontSizeMin = 18;
-            tmpText.fontSizeMax = 28;
-        }
-        
-        return btn;
-    }
-
-    #endregion
-
-    #region Settings Panel
 
     private static void CreateSettingsPanel()
     {
         var canvas = GameObject.Find("MainMenuCanvas");
         if (canvas == null) return;
 
-        var settingsPanel = CreateUIPanel(canvas, "SettingsPanel");
-        SetRectTransformFull(settingsPanel);
-        AddComponentSafe<EscapeTrainRun.SettingsUI>(settingsPanel);
-        settingsPanel.SetActive(false);
+        var settingsPanel = CreateUIPanel(canvas.transform, "SettingsPanel");
+        SetAnchors(settingsPanel, Vector2.zero, Vector2.one);
+        settingsPanel.offsetMin = Vector2.zero;
+        settingsPanel.offsetMax = Vector2.zero;
+        settingsPanel.gameObject.SetActive(false);
 
-        // Dim background
-        var bg = settingsPanel.GetComponent<Image>();
-        bg.color = new Color(0, 0, 0, 0.85f);
+        AddComponentSafe<EscapeTrainRun.UI.SettingsUI>(settingsPanel.gameObject);
 
-        // Content Panel
+        // Overlay
+        var overlay = settingsPanel.gameObject.GetComponent<Image>();
+        overlay.color = new Color(0, 0, 0, 0.8f);
+
+        // Panel
         var panel = CreateUIPanel(settingsPanel, "Panel");
-        SetRectTransform(panel, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(700, 900));
-        panel.GetComponent<Image>().color = panelColor;
+        panel.sizeDelta = new Vector2(600, 500);
+        panel.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.25f, 0.95f);
 
         // Title
-        var title = CreateTextMeshPro(panel, "SettingsTitle", "SETTINGS", 56);
-        SetRectTransform(title, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -60), new Vector2(400, 70));
+        var title = CreateTMPText(panel, "Title", "SETTINGS", 48);
+        title.rectTransform.anchoredPosition = new Vector2(0, 200);
 
-        // Close Button
-        var closeBtn = CreateUIButton(panel, "CloseButton", "✕", 36);
-        SetRectTransform(closeBtn, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-40, -40), new Vector2(60, 60));
-        closeBtn.GetComponent<Image>().color = new Color(0.6f, 0.2f, 0.2f, 1f);
-
-        // Music Slider
-        var musicLabel = CreateTextMeshPro(panel, "MusicLabel", "MUSIC", 28);
-        SetRectTransform(musicLabel, new Vector2(0, 1), new Vector2(0, 1), new Vector2(80, -160), new Vector2(150, 40));
-        musicLabel.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Left;
+        // Music Volume
+        var musicLabel = CreateTMPText(panel, "MusicLabel", "Music", 28);
+        musicLabel.rectTransform.anchoredPosition = new Vector2(-150, 80);
+        musicLabel.alignment = TextAlignmentOptions.Left;
 
         var musicSlider = CreateSlider(panel, "MusicSlider");
-        SetRectTransform(musicSlider, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(50, -200), new Vector2(400, 40));
+        musicSlider.anchoredPosition = new Vector2(100, 80);
 
-        // SFX Slider
-        var sfxLabel = CreateTextMeshPro(panel, "SFXLabel", "SOUND FX", 28);
-        SetRectTransform(sfxLabel, new Vector2(0, 1), new Vector2(0, 1), new Vector2(80, -280), new Vector2(150, 40));
-        sfxLabel.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Left;
+        // SFX Volume
+        var sfxLabel = CreateTMPText(panel, "SFXLabel", "Sound FX", 28);
+        sfxLabel.rectTransform.anchoredPosition = new Vector2(-150, 0);
+        sfxLabel.alignment = TextAlignmentOptions.Left;
 
         var sfxSlider = CreateSlider(panel, "SFXSlider");
-        SetRectTransform(sfxSlider, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(50, -320), new Vector2(400, 40));
+        sfxSlider.anchoredPosition = new Vector2(100, 0);
 
-        // Vibration Toggle
-        var vibrateLabel = CreateTextMeshPro(panel, "VibrateLabel", "VIBRATION", 28);
-        SetRectTransform(vibrateLabel, new Vector2(0, 1), new Vector2(0, 1), new Vector2(80, -400), new Vector2(200, 40));
-        vibrateLabel.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Left;
+        // Close Button
+        var closeBtn = CreateButton(panel, "CloseButton", "CLOSE");
+        closeBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -180);
+        closeBtn.GetComponent<RectTransform>().sizeDelta = new Vector2(200, 60);
 
-        var vibrateToggle = CreateToggle(panel, "VibrateToggle");
-        SetRectTransform(vibrateToggle, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-100, -400), new Vector2(80, 40));
-
-        // Divider
-        var divider = CreateUIImage(panel, "Divider");
-        SetRectTransform(divider, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -480), new Vector2(600, 2));
-        divider.GetComponent<Image>().color = new Color(1, 1, 1, 0.2f);
-
-        // Privacy Button
-        var privacyBtn = CreateUIButton(panel, "PrivacyButton", "Privacy Policy", 28);
-        SetRectTransform(privacyBtn, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -550), new Vector2(500, 60));
-        privacyBtn.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.4f, 1f);
-
-        // Credits Button
-        var creditsBtn = CreateUIButton(panel, "CreditsButton", "Credits", 28);
-        SetRectTransform(creditsBtn, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -630), new Vector2(500, 60));
-        creditsBtn.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.4f, 1f);
-
-        // Parent Controls Button
-        var parentBtn = CreateUIButton(panel, "ParentControlsButton", "Parent Controls", 28);
-        SetRectTransform(parentBtn, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -710), new Vector2(500, 60));
-        parentBtn.GetComponent<Image>().color = new Color(0.4f, 0.3f, 0.5f, 1f);
-
-        // Version Text
-        var versionText = CreateTextMeshPro(panel, "VersionText", "Version 1.0.0", 20);
-        SetRectTransform(versionText, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 30), new Vector2(200, 30));
-        versionText.GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0.5f);
-
-        Debug.Log("✅ Settings Panel created");
+        Debug.Log("✅ Created Settings Panel");
     }
-
-    #endregion
-
-    #region Parent Gate Panel
-
-    private static void CreateParentGatePanel()
-    {
-        var canvas = GameObject.Find("MainMenuCanvas");
-        if (canvas == null) return;
-
-        var parentGate = CreateUIPanel(canvas, "ParentGatePanel");
-        SetRectTransformFull(parentGate);
-        AddComponentSafe<EscapeTrainRun.ParentGateUI>(parentGate);
-        parentGate.SetActive(false);
-
-        var bg = parentGate.GetComponent<Image>();
-        bg.color = new Color(0, 0, 0, 0.9f);
-
-        // Content Panel
-        var panel = CreateUIPanel(parentGate, "Panel");
-        SetRectTransform(panel, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600, 500));
-        panel.GetComponent<Image>().color = panelColor;
-
-        // Title
-        var title = CreateTextMeshPro(panel, "Title", "PARENT VERIFICATION", 36);
-        SetRectTransform(title, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -50), new Vector2(500, 50));
-
-        // Question
-        var question = CreateTextMeshPro(panel, "Question", "What is 7 × 8?", 48);
-        SetRectTransform(question, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 80), new Vector2(400, 70));
-
-        // Answer Buttons Container
-        var answersContainer = CreateUIPanel(panel, "AnswersContainer");
-        SetRectTransform(answersContainer, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -30), new Vector2(500, 100));
-
-        // Answer buttons (4 options)
-        var ans1 = CreateUIButton(answersContainer, "Answer1", "54", 32);
-        SetRectTransform(ans1, new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(60, 0), new Vector2(100, 80));
-
-        var ans2 = CreateUIButton(answersContainer, "Answer2", "56", 32);
-        SetRectTransform(ans2, new Vector2(0.33f, 0.5f), new Vector2(0.33f, 0.5f), new Vector2(25, 0), new Vector2(100, 80));
-
-        var ans3 = CreateUIButton(answersContainer, "Answer3", "58", 32);
-        SetRectTransform(ans3, new Vector2(0.66f, 0.5f), new Vector2(0.66f, 0.5f), new Vector2(-25, 0), new Vector2(100, 80));
-
-        var ans4 = CreateUIButton(answersContainer, "Answer4", "62", 32);
-        SetRectTransform(ans4, new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-60, 0), new Vector2(100, 80));
-
-        // Cancel Button
-        var cancelBtn = CreateUIButton(panel, "CancelButton", "CANCEL", 28);
-        SetRectTransform(cancelBtn, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 60), new Vector2(200, 60));
-        cancelBtn.GetComponent<Image>().color = new Color(0.5f, 0.3f, 0.3f, 1f);
-
-        Debug.Log("✅ Parent Gate Panel created");
-    }
-
-    #endregion
-
-    #region Background
-
-    private static void CreateBackground()
-    {
-        // Create a simple 3D background for visual depth
-        var bgContainer = CreateGameObject("Background3D");
-        bgContainer.transform.position = new Vector3(0, 0, 10);
-
-        // Directional Light
-        var lightObj = new GameObject("DirectionalLight");
-        lightObj.transform.SetParent(bgContainer.transform);
-        var light = lightObj.AddComponent<Light>();
-        light.type = LightType.Directional;
-        light.color = new Color(1f, 0.95f, 0.85f, 1f);
-        light.intensity = 1f;
-        lightObj.transform.rotation = Quaternion.Euler(50, -30, 0);
-
-        // Camera (for 3D background if needed)
-        var camObj = GameObject.Find("Main Camera");
-        if (camObj == null)
-        {
-            camObj = new GameObject("Main Camera");
-            camObj.tag = "MainCamera";
-            camObj.AddComponent<Camera>();
-            camObj.AddComponent<AudioListener>();
-        }
-        camObj.transform.position = new Vector3(0, 2, -10);
-        camObj.transform.rotation = Quaternion.identity;
-
-        Debug.Log("✅ Background created");
-    }
-
-    #endregion
 
     #region Helper Methods
 
@@ -360,199 +157,142 @@ public class MainMenuSceneSetup : Editor
         var existing = GameObject.Find(name);
         if (existing != null)
         {
-            Debug.LogWarning($"GameObject '{name}' already exists, skipping creation.");
+            Debug.Log($"  ⏭️ '{name}' already exists");
             return existing;
         }
-        
+
         var go = new GameObject(name);
         Undo.RegisterCreatedObjectUndo(go, $"Create {name}");
         return go;
     }
 
-    private static GameObject CreateChildGameObject(GameObject parent, string name)
+    private static void AddComponentSafe<T>(GameObject go) where T : Component
+    {
+        if (go.GetComponent<T>() == null)
+        {
+            go.AddComponent<T>();
+        }
+    }
+
+    private static RectTransform CreateUIPanel(Transform parent, string name)
     {
         var go = new GameObject(name);
-        go.transform.SetParent(parent.transform);
-        go.transform.localPosition = Vector3.zero;
-        go.transform.localRotation = Quaternion.identity;
-        go.transform.localScale = Vector3.one;
-        Undo.RegisterCreatedObjectUndo(go, $"Create {name}");
-        return go;
-    }
-
-    private static T AddComponentSafe<T>(GameObject go) where T : Component
-    {
-        var existing = go.GetComponent<T>();
-        if (existing != null) return existing;
-        return go.AddComponent<T>();
-    }
-
-    private static GameObject CreateUIPanel(GameObject parent, string name)
-    {
-        var panel = new GameObject(name);
-        panel.transform.SetParent(parent.transform, false);
-        panel.AddComponent<RectTransform>();
-        panel.AddComponent<CanvasRenderer>();
-        var image = panel.AddComponent<Image>();
-        image.color = new Color(1, 1, 1, 0);
-        Undo.RegisterCreatedObjectUndo(panel, $"Create {name}");
-        return panel;
-    }
-
-    private static GameObject CreateUIImage(GameObject parent, string name)
-    {
-        var imageObj = new GameObject(name);
-        imageObj.transform.SetParent(parent.transform, false);
-        imageObj.AddComponent<RectTransform>();
-        imageObj.AddComponent<CanvasRenderer>();
-        var image = imageObj.AddComponent<Image>();
-        image.color = Color.white;
-        Undo.RegisterCreatedObjectUndo(imageObj, $"Create {name}");
-        return imageObj;
-    }
-
-    private static GameObject CreateUIButton(GameObject parent, string name, string text, float fontSize = 32)
-    {
-        var buttonObj = new GameObject(name);
-        buttonObj.transform.SetParent(parent.transform, false);
-        buttonObj.AddComponent<RectTransform>();
-        buttonObj.AddComponent<CanvasRenderer>();
-        var image = buttonObj.AddComponent<Image>();
-        image.color = new Color(0.3f, 0.5f, 0.8f, 1f);
-        buttonObj.AddComponent<Button>();
-
-        var textObj = new GameObject("Text");
-        textObj.transform.SetParent(buttonObj.transform, false);
-        var textRect = textObj.AddComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = new Vector2(10, 5);
-        textRect.offsetMax = new Vector2(-10, -5);
-
-        var tmp = textObj.AddComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = fontSize;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.white;
-
-        Undo.RegisterCreatedObjectUndo(buttonObj, $"Create {name}");
-        return buttonObj;
-    }
-
-    private static GameObject CreateTextMeshPro(GameObject parent, string name, string text, float fontSize)
-    {
-        var textObj = new GameObject(name);
-        textObj.transform.SetParent(parent.transform, false);
-        textObj.AddComponent<RectTransform>();
-        var tmp = textObj.AddComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = fontSize;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.white;
-        Undo.RegisterCreatedObjectUndo(textObj, $"Create {name}");
-        return textObj;
-    }
-
-    private static GameObject CreateSlider(GameObject parent, string name)
-    {
-        var sliderObj = new GameObject(name);
-        sliderObj.transform.SetParent(parent.transform, false);
-        sliderObj.AddComponent<RectTransform>();
+        go.transform.SetParent(parent);
+        var rt = go.AddComponent<RectTransform>();
+        rt.localScale = Vector3.one;
+        rt.anchoredPosition = Vector2.zero;
         
+        var image = go.AddComponent<Image>();
+        image.color = new Color(0, 0, 0, 0);
+        
+        return rt;
+    }
+
+    private static TextMeshProUGUI CreateTMPText(Transform parent, string name, string text, int fontSize)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent);
+        var rt = go.AddComponent<RectTransform>();
+        rt.localScale = Vector3.one;
+        rt.sizeDelta = new Vector2(600, 80);
+        rt.anchoredPosition = Vector2.zero;
+
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.fontSize = fontSize;
+        tmp.color = Color.white;
+        tmp.alignment = TextAlignmentOptions.Center;
+
+        return tmp;
+    }
+
+    private static Button CreateButton(Transform parent, string name, string text)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent);
+        var rt = go.AddComponent<RectTransform>();
+        rt.localScale = Vector3.one;
+        rt.sizeDelta = new Vector2(200, 60);
+
+        var image = go.AddComponent<Image>();
+        image.color = new Color(0.3f, 0.5f, 0.8f);
+
+        var button = go.AddComponent<Button>();
+        button.targetGraphic = image;
+
+        var textGo = new GameObject("Text");
+        textGo.transform.SetParent(go.transform);
+        var textRt = textGo.AddComponent<RectTransform>();
+        textRt.anchorMin = Vector2.zero;
+        textRt.anchorMax = Vector2.one;
+        textRt.offsetMin = Vector2.zero;
+        textRt.offsetMax = Vector2.zero;
+        textRt.localScale = Vector3.one;
+
+        var tmp = textGo.AddComponent<TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.fontSize = 32;
+        tmp.color = Color.white;
+        tmp.alignment = TextAlignmentOptions.Center;
+
+        return button;
+    }
+
+    private static RectTransform CreateSlider(RectTransform parent, string name)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent);
+        var rt = go.AddComponent<RectTransform>();
+        rt.localScale = Vector3.one;
+        rt.sizeDelta = new Vector2(300, 30);
+
+        var slider = go.AddComponent<Slider>();
+        slider.minValue = 0;
+        slider.maxValue = 1;
+        slider.value = 0.8f;
+
         // Background
-        var bgObj = CreateUIImage(sliderObj, "Background");
-        SetRectTransformFull(bgObj);
-        bgObj.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.3f, 1f);
+        var bgGo = new GameObject("Background");
+        bgGo.transform.SetParent(go.transform);
+        var bgRt = bgGo.AddComponent<RectTransform>();
+        bgRt.anchorMin = Vector2.zero;
+        bgRt.anchorMax = Vector2.one;
+        bgRt.offsetMin = Vector2.zero;
+        bgRt.offsetMax = Vector2.zero;
+        bgRt.localScale = Vector3.one;
+        var bgImg = bgGo.AddComponent<Image>();
+        bgImg.color = new Color(0.3f, 0.3f, 0.3f);
 
         // Fill Area
         var fillArea = new GameObject("Fill Area");
-        fillArea.transform.SetParent(sliderObj.transform, false);
-        var fillRect = fillArea.AddComponent<RectTransform>();
-        fillRect.anchorMin = Vector2.zero;
-        fillRect.anchorMax = Vector2.one;
-        fillRect.offsetMin = new Vector2(5, 5);
-        fillRect.offsetMax = new Vector2(-5, -5);
+        fillArea.transform.SetParent(go.transform);
+        var fillRt = fillArea.AddComponent<RectTransform>();
+        fillRt.anchorMin = Vector2.zero;
+        fillRt.anchorMax = Vector2.one;
+        fillRt.offsetMin = Vector2.zero;
+        fillRt.offsetMax = Vector2.zero;
+        fillRt.localScale = Vector3.one;
 
-        var fill = CreateUIImage(fillArea, "Fill");
-        var fillRectTransform = fill.GetComponent<RectTransform>();
-        fillRectTransform.anchorMin = Vector2.zero;
-        fillRectTransform.anchorMax = new Vector2(0, 1);
-        fillRectTransform.offsetMin = Vector2.zero;
-        fillRectTransform.offsetMax = Vector2.zero;
-        fill.GetComponent<Image>().color = primaryColor;
+        var fill = new GameObject("Fill");
+        fill.transform.SetParent(fillArea.transform);
+        var fillImgRt = fill.AddComponent<RectTransform>();
+        fillImgRt.anchorMin = Vector2.zero;
+        fillImgRt.anchorMax = Vector2.one;
+        fillImgRt.offsetMin = Vector2.zero;
+        fillImgRt.offsetMax = Vector2.zero;
+        fillImgRt.localScale = Vector3.one;
+        var fillImg = fill.AddComponent<Image>();
+        fillImg.color = new Color(0.3f, 0.6f, 0.9f);
 
-        // Handle
-        var handleArea = new GameObject("Handle Slide Area");
-        handleArea.transform.SetParent(sliderObj.transform, false);
-        var handleAreaRect = handleArea.AddComponent<RectTransform>();
-        handleAreaRect.anchorMin = Vector2.zero;
-        handleAreaRect.anchorMax = Vector2.one;
-        handleAreaRect.offsetMin = new Vector2(10, 0);
-        handleAreaRect.offsetMax = new Vector2(-10, 0);
+        slider.fillRect = fillImgRt;
 
-        var handle = CreateUIImage(handleArea, "Handle");
-        var handleRect = handle.GetComponent<RectTransform>();
-        handleRect.sizeDelta = new Vector2(30, 0);
-        handle.GetComponent<Image>().color = Color.white;
-
-        // Add Slider component
-        var slider = sliderObj.AddComponent<Slider>();
-        slider.fillRect = fill.GetComponent<RectTransform>();
-        slider.handleRect = handle.GetComponent<RectTransform>();
-        slider.direction = Slider.Direction.LeftToRight;
-        slider.minValue = 0;
-        slider.maxValue = 1;
-        slider.value = 1;
-
-        Undo.RegisterCreatedObjectUndo(sliderObj, $"Create {name}");
-        return sliderObj;
+        return rt;
     }
 
-    private static GameObject CreateToggle(GameObject parent, string name)
+    private static void SetAnchors(RectTransform rt, Vector2 min, Vector2 max)
     {
-        var toggleObj = new GameObject(name);
-        toggleObj.transform.SetParent(parent.transform, false);
-        toggleObj.AddComponent<RectTransform>();
-
-        // Background
-        var bg = CreateUIImage(toggleObj, "Background");
-        SetRectTransformFull(bg);
-        bg.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.4f, 1f);
-
-        // Checkmark
-        var checkmark = CreateUIImage(toggleObj, "Checkmark");
-        SetRectTransform(checkmark, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(30, 30));
-        checkmark.GetComponent<Image>().color = primaryColor;
-
-        var toggle = toggleObj.AddComponent<Toggle>();
-        toggle.targetGraphic = bg.GetComponent<Image>();
-        toggle.graphic = checkmark.GetComponent<Image>();
-        toggle.isOn = true;
-
-        Undo.RegisterCreatedObjectUndo(toggleObj, $"Create {name}");
-        return toggleObj;
-    }
-
-    private static void SetRectTransform(GameObject go, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
-    {
-        var rect = go.GetComponent<RectTransform>();
-        if (rect == null) rect = go.AddComponent<RectTransform>();
-        
-        rect.anchorMin = anchorMin;
-        rect.anchorMax = anchorMax;
-        rect.anchoredPosition = anchoredPosition;
-        rect.sizeDelta = sizeDelta;
-    }
-
-    private static void SetRectTransformFull(GameObject go)
-    {
-        var rect = go.GetComponent<RectTransform>();
-        if (rect == null) rect = go.AddComponent<RectTransform>();
-        
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
+        rt.anchorMin = min;
+        rt.anchorMax = max;
     }
 
     #endregion

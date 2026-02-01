@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using EscapeTrainRun.Core;
+using EscapeTrainRun.Player;
 
 namespace EscapeTrainRun.Obstacles
 {
@@ -206,14 +207,14 @@ namespace EscapeTrainRun.Obstacles
             indicator.UpdateUrgency(urgency, color, isCritical);
         }
 
-        private Sprite GetWarningIcon(ObstacleAvoidance avoidance)
+        private Sprite GetWarningIcon(ObstacleAction avoidance)
         {
             return avoidance switch
             {
-                ObstacleAvoidance.Jump => jumpWarningIcon,
-                ObstacleAvoidance.Slide => slideWarningIcon,
-                ObstacleAvoidance.Dodge => dodgeWarningIcon,
-                ObstacleAvoidance.None => dangerWarningIcon,
+                ObstacleAction.Jump => jumpWarningIcon,
+                ObstacleAction.Slide => slideWarningIcon,
+                ObstacleAction.ChangeLane => dodgeWarningIcon,
+                ObstacleAction.Any => dangerWarningIcon,
                 _ => dangerWarningIcon
             };
         }

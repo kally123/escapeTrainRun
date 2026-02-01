@@ -48,7 +48,7 @@ namespace EscapeTrainRun.Obstacles
         public int LanesOccupied => lanesOccupied;
         public float Height => height;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             obstacleCollider = GetComponent<Collider>();
             startPosition = transform.position;
@@ -156,6 +156,30 @@ namespace EscapeTrainRun.Obstacles
             }
 
             // Could also disable renderers for visual feedback
+        }
+
+        /// <summary>
+        /// Activates the obstacle.
+        /// </summary>
+        public virtual void Activate()
+        {
+            isActive = true;
+            if (obstacleCollider != null)
+            {
+                obstacleCollider.enabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Deactivates the obstacle.
+        /// </summary>
+        public virtual void Deactivate()
+        {
+            isActive = false;
+            if (obstacleCollider != null)
+            {
+                obstacleCollider.enabled = false;
+            }
         }
 
         /// <summary>

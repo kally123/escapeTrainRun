@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using EscapeTrainRun.Core;
 using EscapeTrainRun.Environment;
+using EscapeTrainRun.Events;
 
 namespace EscapeTrainRun.Audio
 {
