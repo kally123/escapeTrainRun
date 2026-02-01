@@ -147,10 +147,13 @@ namespace EscapeTrainRun.Obstacles
         private void OnDeath()
         {
             // Game over
-            var gameOverData = new GameOverData
-            {
-                reason = GameOverReason.Collision
-            };
+            var gameOverData = new GameOverData(
+                score: 0,
+                coins: 0,
+                distance: 0f,
+                highScore: false,
+                mode: Environment.ThemeType.Train
+            );
             GameEvents.RaiseGameOver(gameOverData);
         }
 

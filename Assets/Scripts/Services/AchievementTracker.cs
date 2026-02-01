@@ -80,18 +80,18 @@ namespace EscapeTrainRun.Services
             float runDuration = Time.time - runStartTime;
 
             // Check special achievements based on session data
-            if (!hasCrashedThisRun && data.distance >= 500)
+            if (!hasCrashedThisRun && data.DistanceTraveled >= 500)
             {
                 achievementService.UnlockAchievement("flawless_500m");
             }
 
-            if (!hasCrashedThisRun && data.distance >= 1000)
+            if (!hasCrashedThisRun && data.DistanceTraveled >= 1000)
             {
                 achievementService.UnlockAchievement("flawless_1km");
             }
 
             // Speed run achievement
-            if (runDuration < 60 && data.score >= 10000)
+            if (runDuration < 60 && data.FinalScore >= 10000)
             {
                 achievementService.UnlockAchievement("speed_scorer");
             }

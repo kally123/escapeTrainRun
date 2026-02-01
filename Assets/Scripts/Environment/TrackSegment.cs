@@ -43,6 +43,17 @@ namespace EscapeTrainRun.Environment
         }
 
         /// <summary>
+        /// Initializes the segment for a specific theme and segment index.
+        /// </summary>
+        /// <param name="themeType">The theme to apply.</param>
+        /// <param name="segmentIndex">The index of this segment in the level.</param>
+        public void Initialize(ThemeType themeType, int segmentIndex)
+        {
+            theme = themeType;
+            ApplyTheme();
+        }
+
+        /// <summary>
         /// Applies theme-specific visuals to the segment.
         /// </summary>
         private void ApplyTheme()
@@ -68,6 +79,14 @@ namespace EscapeTrainRun.Environment
         }
 
         /// <summary>
+        /// Gets all obstacle spawn points for this segment.
+        /// </summary>
+        public Transform[] GetObstacleSpawnPoints()
+        {
+            return obstacleSpawnPoints;
+        }
+
+        /// <summary>
         /// Gets a random obstacle spawn point.
         /// </summary>
         public Transform GetRandomObstacleSpawnPoint()
@@ -85,6 +104,14 @@ namespace EscapeTrainRun.Environment
         public Transform[] GetCoinSpawnPoints()
         {
             return coinSpawnPoints;
+        }
+
+        /// <summary>
+        /// Gets all power-up spawn points for this segment.
+        /// </summary>
+        public Transform[] GetPowerUpSpawnPoints()
+        {
+            return powerUpSpawnPoints;
         }
 
         /// <summary>

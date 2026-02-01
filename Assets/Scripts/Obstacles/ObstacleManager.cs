@@ -124,7 +124,7 @@ namespace EscapeTrainRun.Obstacles
                 var obstacle = instance.GetComponent<Obstacle>();
                 if (obstacle != null)
                 {
-                    obstacle.Initialize(type);
+                    obstacle.Initialize(currentTheme);
                     instance.SetActive(false);
                     obstaclePools[type].Enqueue(obstacle);
                 }
@@ -150,7 +150,7 @@ namespace EscapeTrainRun.Obstacles
                 {
                     var instance = Instantiate(prefab, poolContainer);
                     obstacle = instance.GetComponent<Obstacle>();
-                    obstacle?.Initialize(type);
+                    obstacle?.Initialize(currentTheme);
                 }
             }
 

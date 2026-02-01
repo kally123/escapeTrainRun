@@ -46,6 +46,12 @@ namespace EscapeTrainRun.Collectibles
         /// Duration: Instant.
         /// Visual: Confetti explosion.
         /// </summary>
-        MysteryBox = 5
+        MysteryBox = 5,
+
+        /// <summary>
+        /// No power-up / Invalid.
+        /// Used as default or null value.
+        /// </summary>
+        None = -1
     }
 }

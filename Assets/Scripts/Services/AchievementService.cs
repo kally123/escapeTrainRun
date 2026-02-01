@@ -358,20 +358,20 @@ namespace EscapeTrainRun.Services
 
         private void HandleGameOver(GameOverData data)
         {
-            sessionDistance = data.distance;
+            sessionDistance = data.DistanceTraveled;
 
             // Check distance achievements
-            CheckMilestone("run_1km", data.distance >= 1000);
-            CheckMilestone("run_5km", data.distance >= 5000);
-            CheckMilestone("run_10km", data.distance >= 10000);
+            CheckMilestone("run_1km", data.DistanceTraveled >= 1000);
+            CheckMilestone("run_5km", data.DistanceTraveled >= 5000);
+            CheckMilestone("run_10km", data.DistanceTraveled >= 10000);
 
             // Update cumulative distance
-            UpdateCumulativeProgress("total_distance_100km", (int)data.distance, 100000);
+            UpdateCumulativeProgress("total_distance_100km", (int)data.DistanceTraveled, 100000);
 
             // Check session-specific achievements
-            CheckMilestone("no_coins_1km", data.distance >= 1000 && sessionCoinsCollected == 0);
+            CheckMilestone("no_coins_1km", data.DistanceTraveled >= 1000 && sessionCoinsCollected == 0);
             CheckMilestone("near_miss_master", sessionNearMisses >= 10);
-            CheckMilestone("perfect_run_100", sessionObstaclesPassed >= 100 && data.distance > 0);
+            CheckMilestone("perfect_run_100", sessionObstaclesPassed >= 100 && data.DistanceTraveled > 0);
 
             // Save progress
             SaveProgressToLocal();

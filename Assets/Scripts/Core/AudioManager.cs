@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using EscapeTrainRun.Events;
 using EscapeTrainRun.Environment;
+using EscapeTrainRun.Utils;
 
 namespace EscapeTrainRun.Core
 {

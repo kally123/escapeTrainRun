@@ -317,10 +317,10 @@ namespace EscapeTrainRun.Quality
 
             foreach (var character in characters)
             {
-                if (character != null && !string.IsNullOrEmpty(character.characterId))
+                if (character != null && !string.IsNullOrEmpty(character.CharacterId))
                 {
                     validCount++;
-                    result.Details.Add($"✓ {character.displayName}: Valid");
+                    result.Details.Add($"✓ {character.DisplayName}: Valid");
                 }
             }
 
@@ -344,7 +344,7 @@ namespace EscapeTrainRun.Quality
 
             foreach (var type in powerUpTypes)
             {
-                if (type == PowerUpType.None) continue;
+                if ((int)type < 0) continue; // Skip None (-1)
 
                 string prefabPath = $"Prefabs/PowerUps/{type}";
                 var prefab = Resources.Load(prefabPath);
@@ -641,19 +641,19 @@ namespace EscapeTrainRun.Quality
         {
             var result = new CheckResult("Smooth Lane Transitions");
 
-            var player = FindObjectOfType<PlayerMovement>();
+            var player = FindObjectOfType<PlayerController>();
             if (player != null)
             {
                 result.Passed = true;
                 result.Score = 100f;
-                result.Details.Add("✓ PlayerMovement component found");
+                result.Details.Add("✓ PlayerController component found");
                 result.Details.Add("Lane change speed configured");
             }
             else
             {
                 result.Passed = false;
                 result.Score = 0f;
-                result.Details.Add("✗ PlayerMovement not found in scene");
+                result.Details.Add("✗ PlayerController not found in scene");
             }
 
             return result;

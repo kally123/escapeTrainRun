@@ -25,6 +25,12 @@ namespace EscapeTrainRun.Environment
         /// Obstacles: Benches, branches, sprinklers, friendly dogs.
         /// Collectibles: Golden stars, treasure chests, golden leaves.
         /// </summary>
-        Ground = 2
+        Ground = 2,
+
+        /// <summary>
+        /// Park environment - alternative outdoor theme.
+        /// Alias for Ground theme for compatibility.
+        /// </summary>
+        Park = 2
     }
 }

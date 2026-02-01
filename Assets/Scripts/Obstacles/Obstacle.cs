@@ -40,13 +40,19 @@ namespace EscapeTrainRun.Obstacles
         private float moveTimer;
         private ThemeType currentTheme;
         private Collider obstacleCollider;
+        private int currentLane = 1;
+        private bool isShowingWarning;
+        private bool isDestructible;
 
         // IObstacle implementation
         public ObstacleAction RequiredAction => requiredAction;
+        public ObstacleAction AvoidanceMethod => requiredAction;
         public bool IsActive => isActive;
         public ObstacleType Type => obstacleType;
         public int LanesOccupied => lanesOccupied;
         public float Height => height;
+        public int Lane => currentLane;
+        public bool IsDestructible => isDestructible;
 
         protected virtual void Awake()
         {
@@ -198,6 +204,47 @@ namespace EscapeTrainRun.Obstacles
         }
 
         /// <summary>
+        /// Sets the lane this obstacle is in.
+        /// </summary>
+        public void SetLane(int lane)
+        {
+            currentLane = lane;
+        }
+
+        /// <summary>
+        /// Shows the warning indicator for this obstacle.
+        /// </summary>
+        public virtual void ShowWarning()
+        {
+            isShowingWarning = true;
+        }
+
+        /// <summary>
+        /// Hides the warning indicator for this obstacle.
+        /// </summary>
+        public virtual void HideWarning()
+        {
+            isShowingWarning = false;
+        }
+
+        /// <summary>
+        /// Destroys this obstacle (for destructible obstacles).
+        /// </summary>
+        public virtual void DestroyObstacle()
+        {
+            Deactivate();
+            // Could play destruction effect here
+        }
+
+        /// <summary>
+        /// Called when player collides with this obstacle.
+        /// </summary>
+        public virtual void OnPlayerCollision(GameObject player)
+        {
+            // Default behavior - handled by PlayerCollision
+        }
+
+        /// <summary>
         /// Sets the obstacle position.
         /// </summary>
         public void SetPosition(Vector3 position)
@@ -289,6 +336,22 @@ namespace EscapeTrainRun.Obstacles
         /// <summary>Low obstacle requiring jump.</summary>
         LowBarrier,
         /// <summary>Overhead obstacle requiring slide.</summary>
-        Overhead
+        Overhead,
+        /// <summary>Low obstacle (jump over).</summary>
+        Low,
+        /// <summary>High obstacle (slide under).</summary>
+        High,
+        /// <summary>Wide obstacle spanning lanes.</summary>
+        Wide,
+        /// <summary>Combined low and high obstacle.</summary>
+        Combined,
+        /// <summary>Flying obstacle at head height.</summary>
+        Flying,
+        /// <summary>Can be destroyed by power-ups.</summary>
+        Destructible,
+        /// <summary>Environmental hazard.</summary>
+        Hazard,
+        /// <summary>Boss obstacle.</summary>
+        Boss
     }
 }
